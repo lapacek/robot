@@ -1,5 +1,3 @@
-module lapacek.art/cmd/go-ev3-dualshock-3
+module go-ev3-dualshock-3/cmd
 
 go 1.16
-
-require gobot.io/x/gobot v1.15.0
