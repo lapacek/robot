@@ -64,9 +64,7 @@ func (t *Tracker) Run () {
 		//joystick.On(joystick.Event("left_y"), func(data interface{}) {
 		//	fmt.Println("left_y", data)
 		//})
-		joystick.On(joystick.Event("right_x"), Tracker.handleRightStickAction {
-			fmt.Println("right_x", data)
-		})
+		joystick.On(joystick.Event("right_x"), t.handleStickAction )
 		//joystick.On(joystick.Event("right_y"), func(data interface{}) {
 		//	fmt.Println("right_y", data)
 		//})
@@ -91,8 +89,6 @@ func (t *Tracker) Run () {
 // TODO: Make a unit test for this strategy.
 func (t *Tracker) handleStickAction(data interface{}) {
 	fmt.Println("right_x", data)
-
-	maxMedium := t.outA.MaxSpeed()
 
 	input, ok := data.(int)
 	if !ok {
