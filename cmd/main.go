@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-ev3-dualshock-3/internal"
+	"github.com/lapacek/go-ev3-dualshock-3/internal"
 )
 
 func main() {
