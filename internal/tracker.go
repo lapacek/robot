@@ -2,13 +2,12 @@ package internal
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/ev3go/ev3dev"
-	_ "github.com/ev3go/ev3dev"
 	"github.com/sirupsen/logrus"
 	"gobot.io/x/gobot"
-	_ "gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/joystick"
-	"time"
 )
 
 type work_t func()
@@ -28,9 +27,9 @@ type Tracker struct {
 func (t *Tracker) Open () {
 	logrus.Debug("Opening...")
 
-	// Stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
+	// stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
 	//
-	// Get the handle for the medium motor on outA.
+	// get the handle for the medium motor on outA.
 	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
 	if err != nil {
 		logrus.Fatalf("failed to find medium motor on outA: %v", err)
