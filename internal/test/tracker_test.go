@@ -4,5 +4,5 @@ import "testing"
 
 func Test_tracker(t *testing.T) {
 	
-	t.Errorf()
+	t.Error("The tracker test is not implemented.")
 }
