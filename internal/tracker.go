@@ -1,0 +1,112 @@
+package internal
+
+import (
+	"fmt"
+	"github.com/ev3go/ev3dev"
+	_ "github.com/ev3go/ev3dev"
+	"github.com/sirupsen/logrus"
+	"gobot.io/x/gobot"
+	_ "gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/joystick"
+	"time"
+)
+
+type work_t func()
+
+type Tracker struct {
+
+	// TODO: nullptr
+	robot gobot.Robot
+	work work_t
+
+	outA *ev3dev.TachoMotor
+
+	joystick *joystick.Driver
+	joystickAdaptor *joystick.Adaptor
+}
+
+func (t *Tracker) Open () {
+	logrus.Debug("Opening...")
+
+	// Stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
+	//
+	// Get the handle for the medium motor on outA.
+	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
+	if err != nil {
+		logrus.Fatalf("failed to find medium motor on outA: %v", err)
+	}
+	err = outA.SetStopAction("brake").Err()
+	if err != nil {
+		logrus.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+	}
+
+	t.joystickAdaptor = joystick.NewAdaptor()
+	t.joystick = joystick.NewDriver(t.joystickAdaptor,
+		"../config/dualshock3.json",
+	)
+
+	t.work = func() {
+
+		logrus.Debug("Working...")
+		defer logrus.Debug("Stoping the work...")
+
+		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction )
+	}
+}
+
+func (t *Tracker) Run () {
+
+	logrus.Debug("Starting...")
+
+	robot := gobot.NewRobot("joystickBot",
+		[]gobot.Connection{t.joystickAdaptor},
+		[]gobot.Device{t.joystick},
+		t.work,
+	)
+
+	err := robot.Start()
+
+	if err != nil {
+		logrus.Error("Error occured: ", err)
+	}
+
+	logrus.Debug("Stoping...")
+}
+
+func (t *Tracker) handleStickAction(data interface{}) {
+	logrus.Debugf("right_x data(%v)", data)
+
+	input, ok := data.(int)
+	if !ok {
+		logrus.Errorf("Invalid input(%v)", data)
+	}
+
+	// max is 32000
+	// example: 15.5k / 8k = 1
+	// minimum motor speed quantum is 25
+	speed := (input / 8000) * 25
+
+	t.outA.SetSpeedSetpoint(speed).Command("run-forever")
+
+	time.Sleep(time.Second / 2)
+	t.outA.Command("stop")
+
+	checkErrors(t.outA)
+}
+
+func checkErrors(devs ...ev3dev.Device) {
+	for _, d := range devs {
+		err := d.(*ev3dev.TachoMotor).Err()
+		if err != nil {
+			drv, dErr := ev3dev.DriverFor(d)
+			if dErr != nil {
+				drv = fmt.Sprintf("(missing driver name: %v)", dErr)
+			}
+			addr, aErr := ev3dev.AddressOf(d)
+			if aErr != nil {
+				drv = fmt.Sprintf("(missing port address: %v)", aErr)
+			}
+			logrus.Fatalf("motor error for %s:%s on port %s: %v", d, drv, addr, err)
+		}
+	}
+}
