@@ -8,15 +8,21 @@ import (
 	"gobot.io/x/gobot"
 	_ "gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/joystick"
-	"log"
 	"time"
 )
 
+type work_t func()
+
 type Tracker struct {
+
 	// TODO: nullptr
 	robot gobot.Robot
+	work work_t
 
 	outA *ev3dev.TachoMotor
+
+	joystick *joystick.Driver
+	joystickAdaptor *joystick.Adaptor
 }
 
 func (t *Tracker) Open () {
@@ -27,11 +33,24 @@ func (t *Tracker) Open () {
 	// Get the handle for the medium motor on outA.
 	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
 	if err != nil {
-		log.Fatalf("failed to find medium motor on outA: %v", err)
+		logrus.Fatalf("failed to find medium motor on outA: %v", err)
 	}
 	err = outA.SetStopAction("brake").Err()
 	if err != nil {
-		log.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+		logrus.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+	}
+
+	t.joystickAdaptor = joystick.NewAdaptor()
+	t.joystick = joystick.NewDriver(t.joystickAdaptor,
+		"../config/dualshock3.json",
+	)
+
+	t.work = func() {
+
+		logrus.Debug("Working...")
+		defer logrus.Debug("Stoping the work...")
+
+		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction )
 	}
 }
 
@@ -39,41 +58,10 @@ func (t *Tracker) Run () {
 
 	logrus.Debug("Starting...")
 
-	joystickAdaptor := joystick.NewAdaptor()
-	joystick := joystick.NewDriver(joystickAdaptor,
-		//"./platforms/joystick/configs/dualshock3.json",
-		"../cmd/dualshock3.json",
-	)
-
-	work := func() {
-		//joystick.On(joystick.Event("square_press"), func(data interface{}) {
-		//	fmt.Println("square_press")
-		//})
-		//joystick.On(joystick.Event("square_release"), func(data interface{}) {
-		//	fmt.Println("square_release")
-		//})
-		//joystick.On(joystick.Event("triangle_press"), func(data interface{}) {
-		//	fmt.Println("triangle_press")
-		//})
-		//joystick.On(joystick.Event("triangle_release"), func(data interface{}) {
-		//	fmt.Println("triangle_release")
-		//})
-		//joystick.On(joystick.Event("left_x"), func(data interface{}) {
-		//	fmt.Println("left_x", data)
-		//})
-		//joystick.On(joystick.Event("left_y"), func(data interface{}) {
-		//	fmt.Println("left_y", data)
-		//})
-		joystick.On(joystick.Event("right_x"), t.handleStickAction )
-		//joystick.On(joystick.Event("right_y"), func(data interface{}) {
-		//	fmt.Println("right_y", data)
-		//})
-	}
-
 	robot := gobot.NewRobot("joystickBot",
-		[]gobot.Connection{joystickAdaptor},
-		[]gobot.Device{joystick},
-		work,
+		[]gobot.Connection{t.joystickAdaptor},
+		[]gobot.Device{t.joystick},
+		t.work,
 	)
 
 	err := robot.Start()
@@ -86,7 +74,7 @@ func (t *Tracker) Run () {
 }
 
 func (t *Tracker) handleStickAction(data interface{}) {
-	fmt.Println("right_x", data)
+	logrus.Debugf("right_x data(%v)", data)
 
 	input, ok := data.(int)
 	if !ok {
@@ -98,7 +86,6 @@ func (t *Tracker) handleStickAction(data interface{}) {
 	// minimum motor speed quantum is 25
 	speed := (input / 8000) * 25
 
-	//t.outA.SetSpeedSetpoint(50 * maxMedium / 100).Command("run-forever")
 	t.outA.SetSpeedSetpoint(speed).Command("run-forever")
 
 	time.Sleep(time.Second / 2)
@@ -119,7 +106,7 @@ func checkErrors(devs ...ev3dev.Device) {
 			if aErr != nil {
 				drv = fmt.Sprintf("(missing port address: %v)", aErr)
 			}
-			log.Fatalf("motor error for %s:%s on port %s: %v", d, drv, addr, err)
+			logrus.Fatalf("motor error for %s:%s on port %s: %v", d, drv, addr, err)
 		}
 	}
 }
