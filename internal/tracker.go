@@ -85,7 +85,6 @@ func (t *Tracker) Run () {
 	logrus.Debug("Stoping...")
 }
 
-// TODO: Make a unit test for this strategy.
 func (t *Tracker) handleStickAction(data interface{}) {
 	fmt.Println("right_x", data)
 
