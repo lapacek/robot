@@ -15,17 +15,21 @@ type work_t func()
 type Tracker struct {
 
 	// TODO: nullptr
-	robot gobot.Robot
-	work work_t
-
-	outA *ev3dev.TachoMotor
-
 	joystick *joystick.Driver
 	joystickAdaptor *joystick.Adaptor
+	robot *gobot.Robot
+
+	// the physical outputs
+	outA *ev3dev.TachoMotor
+	outB *ev3dev.TachoMotor
+
+	work work_t
 }
 
 func (t *Tracker) Open () {
+
 	logrus.Debug("Opening...")
+	defer logrus.Debug("Opened")
 
 	// stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
 	//
@@ -34,9 +38,21 @@ func (t *Tracker) Open () {
 	if err != nil {
 		logrus.Fatalf("failed to find medium motor on outA: %v", err)
 	}
+
 	err = outA.SetStopAction("brake").Err()
 	if err != nil {
 		logrus.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+	}
+
+	// get the handle for the left large motor on outB.
+	outB, err := ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
+	if err != nil {
+		logrus.Fatalf("failed to find left large motor on outB: %v", err)
+	}
+
+	err = outB.SetStopAction("brake").Err()
+	if err != nil {
+		logrus.Fatalf("failed to set brake stop for left large motor on outB: %v", err)
 	}
 
 	t.joystickAdaptor = joystick.NewAdaptor()
@@ -47,29 +63,30 @@ func (t *Tracker) Open () {
 	t.work = func() {
 
 		logrus.Debug("Working...")
-		defer logrus.Debug("Stoping the work...")
+		defer logrus.Debug("Work stoped")
 
-		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction )
+		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction)
+		t.joystick.On(t.joystick.Event("right_y"), t.handleStickAction)
+		t.joystick.On(t.joystick.Event("left_x"), t.handleStickAction)
+		t.joystick.On(t.joystick.Event("left_y"), t.handleStickAction)
 	}
 }
 
 func (t *Tracker) Run () {
 
 	logrus.Debug("Starting...")
+	defer logrus.Debug("Stoped")
 
-	robot := gobot.NewRobot("joystickBot",
+	t.robot = gobot.NewRobot("joystickBot",
 		[]gobot.Connection{t.joystickAdaptor},
 		[]gobot.Device{t.joystick},
 		t.work,
 	)
 
-	err := robot.Start()
-
+	err := t.robot.Start()
 	if err != nil {
 		logrus.Error("Error occured: ", err)
 	}
-
-	logrus.Debug("Stoping...")
 }
 
 func (t *Tracker) handleStickAction(data interface{}) {
@@ -94,17 +111,22 @@ func (t *Tracker) handleStickAction(data interface{}) {
 }
 
 func checkErrors(devs ...ev3dev.Device) {
+
 	for _, d := range devs {
+
 		err := d.(*ev3dev.TachoMotor).Err()
 		if err != nil {
+
 			drv, dErr := ev3dev.DriverFor(d)
 			if dErr != nil {
 				drv = fmt.Sprintf("(missing driver name: %v)", dErr)
 			}
+
 			addr, aErr := ev3dev.AddressOf(d)
 			if aErr != nil {
 				drv = fmt.Sprintf("(missing port address: %v)", aErr)
 			}
+
 			logrus.Fatalf("motor error for %s:%s on port %s: %v", d, drv, addr, err)
 		}
 	}
