@@ -7,6 +7,5 @@ import (
 func main() {
 
 	robot := internal.Tracker{}
-	robot.Open()
 	robot.Run()
 }
