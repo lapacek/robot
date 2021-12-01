@@ -15,9 +15,9 @@ type work_t func()
 type Tracker struct {
 
 	// TODO: nullptr
-	joystick *joystick.Driver
+	joystick        *joystick.Driver
 	joystickAdaptor *joystick.Adaptor
-	robot *gobot.Robot
+	robot           *gobot.Robot
 
 	// the physical outputs
 	outA *ev3dev.TachoMotor
@@ -26,7 +26,7 @@ type Tracker struct {
 	work work_t
 }
 
-func (t *Tracker) Open () {
+func (t *Tracker) open() bool {
 
 	logrus.Debug("Opening...")
 	defer logrus.Debug("Opened")
@@ -72,7 +72,11 @@ func (t *Tracker) Open () {
 	}
 }
 
-func (t *Tracker) Run () {
+func (t *Tracker) Run() {
+
+	if !t.open() {
+		logrus.Fatal("Component is not opened.")
+	}
 
 	logrus.Debug("Starting...")
 	defer logrus.Debug("Stoped")
@@ -82,7 +86,7 @@ func (t *Tracker) Run () {
 		[]gobot.Device{t.joystick},
 		t.work,
 	)
-
+	
 	err := t.robot.Start()
 	if err != nil {
 		logrus.Error("Error occured: ", err)
@@ -108,6 +112,10 @@ func (t *Tracker) handleStickAction(data interface{}) {
 	t.outA.Command("stop")
 
 	checkErrors(t.outA)
+}
+
+func (t *Tracker) close() {
+
 }
 
 func checkErrors(devs ...ev3dev.Device) {
