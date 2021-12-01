@@ -27,21 +27,46 @@ type Tracker struct {
 }
 
 func (t *Tracker) open() bool {
-
+  
+	var err error
 	logrus.Debug("Opening...")
-	defer logrus.Debug("Opened")
+	defer func () {
+		if err != nil {
+			logrus.Fatal("Component can`t be open.")
+		}
+		logrus.Debug("Opened")
+	}()
 
 	// stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
 	//
 	// get the handle for the medium motor on outA.
 	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
 	if err != nil {
-		logrus.Fatalf("failed to find medium motor on outA: %v", err)
+		logrus.Errorf("Failed to find medium motor on outA: %v", err)
+
+		return false
 	}
 
 	err = outA.SetStopAction("brake").Err()
 	if err != nil {
-		logrus.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+		logrus.Errorf("Failed to set brake stop for medium motor on outA: %v", err)
+
+		return false
+	}
+
+	// get the handle for the left large motor on outB.
+	outB, err := ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
+	if err != nil {
+		logrus.Errorf("Failed to find left large motor on outB: %v", err)
+
+		return false
+	}
+
+	err = outB.SetStopAction("brake").Err()
+	if err != nil {
+		logrus.Errorf("Failed to set brake stop for left large motor on outB: %v", err)
+
+		return false
 	}
 
 	// get the handle for the left large motor on outB.
@@ -70,6 +95,8 @@ func (t *Tracker) open() bool {
 		t.joystick.On(t.joystick.Event("left_x"), t.handleStickAction)
 		t.joystick.On(t.joystick.Event("left_y"), t.handleStickAction)
 	}
+
+	return true
 }
 
 func (t *Tracker) Run() {
@@ -86,7 +113,7 @@ func (t *Tracker) Run() {
 		[]gobot.Device{t.joystick},
 		t.work,
 	)
-	
+  
 	err := t.robot.Start()
 	if err != nil {
 		logrus.Error("Error occured: ", err)
