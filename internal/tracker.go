@@ -24,21 +24,51 @@ type Tracker struct {
 	joystickAdaptor *joystick.Adaptor
 }
 
-func (t *Tracker) Open () {
+func (t *Tracker) open() bool {
+
+	var err error
 	logrus.Debug("Opening...")
+	defer func () {
+		if err != nil {
+			logrus.Fatal("Component can`t be open.")
+		}
+		logrus.Debug("Opened")
+	}()
 
 	// stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
 	//
 	// get the handle for the medium motor on outA.
 	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
 	if err != nil {
-		logrus.Fatalf("failed to find medium motor on outA: %v", err)
+		logrus.Errorf("Failed to find medium motor on outA: %v", err)
+
+		return false
 	}
 	err = outA.SetStopAction("brake").Err()
 	if err != nil {
-		logrus.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+		logrus.Errorf("Failed to set brake stop for medium motor on outA: %v", err)
+
+		return false
 	}
 
+<<<<<<< Updated upstream
+=======
+	// get the handle for the left large motor on outB.
+	outB, err := ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
+	if err != nil {
+		logrus.Errorf("Failed to find left large motor on outB: %v", err)
+
+		return false
+	}
+
+	err = outB.SetStopAction("brake").Err()
+	if err != nil {
+		logrus.Errorf("Failed to set brake stop for left large motor on outB: %v", err)
+
+		return false
+	}
+
+>>>>>>> Stashed changes
 	t.joystickAdaptor = joystick.NewAdaptor()
 	t.joystick = joystick.NewDriver(t.joystickAdaptor,
 		"../config/dualshock3.json",
@@ -51,6 +81,8 @@ func (t *Tracker) Open () {
 
 		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction )
 	}
+
+	return true
 }
 
 func (t *Tracker) Run () {
@@ -63,8 +95,12 @@ func (t *Tracker) Run () {
 		t.work,
 	)
 
+<<<<<<< Updated upstream
 	err := robot.Start()
 
+=======
+	err := t.robot.Start()
+>>>>>>> Stashed changes
 	if err != nil {
 		logrus.Error("Error occured: ", err)
 	}
