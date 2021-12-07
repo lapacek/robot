@@ -69,17 +69,6 @@ func (t *Tracker) open() bool {
 		return false
 	}
 
-	// get the handle for the left large motor on outB.
-	outB, err := ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
-	if err != nil {
-		logrus.Fatalf("failed to find left large motor on outB: %v", err)
-	}
-
-	err = outB.SetStopAction("brake").Err()
-	if err != nil {
-		logrus.Fatalf("failed to set brake stop for left large motor on outB: %v", err)
-	}
-
 	t.joystickAdaptor = joystick.NewAdaptor()
 	t.joystick = joystick.NewDriver(t.joystickAdaptor,
 		"../config/dualshock3.json",
