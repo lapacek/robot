@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"time"
 
+	internal_joystick "github.com/lapacek/go-ev3-dualshock-3/internal/joystick"
+
 	"github.com/ev3go/ev3dev"
 	"github.com/sirupsen/logrus"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/joystick"
 )
+
+// represents an absolute imaginary limit speed of the motor
+const motorAbsLimitSpeed = 100
 
 type work_t func()
 
@@ -110,19 +115,15 @@ func (t *Tracker) Run() {
 }
 
 func (t *Tracker) handleStickAction(data interface{}) {
-	logrus.Debugf("right_x data(%v)", data)
+	logrus.Tracef("Joystick event, right_x data(%v)", data)
 
-	input, ok := data.(int)
-	if !ok {
-		logrus.Errorf("Invalid input(%v)", data)
+	ratio, err := internal_joystick.GetStickPosRatio(data)
+	if err != nil {
+		logrus.Errorf("Computation failed, err(%v)", err)
 	}
 
-	// max is 32000
-	// example: 15.5k / 8k = 1
-	// minimum motor speed quantum is 25
-	speed := (input / 8000) * 25
-
-	t.outA.SetSpeedSetpoint(speed).Command("run-forever")
+	energy := int(ratio * motorAbsLimitSpeed)
+	t.outA.SetSpeedSetpoint(energy).Command("run-forever")
 
 	time.Sleep(time.Second / 2)
 	t.outA.Command("stop")

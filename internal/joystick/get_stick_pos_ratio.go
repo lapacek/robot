@@ -2,6 +2,7 @@ package joystick
 
 import (
 	"fmt"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -10,7 +11,6 @@ const limitPos float32 = 32000.0
 
 // provides the ratio of the stick position to the stick limit position, where
 // stick position is floating point number included in the [-32000.0, 32000.0]
-//
 func GetStickPosRatio(input interface{}) (float32, error) {
 
 	stickPos, ok := input.(float32)
