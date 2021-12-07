@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// stores the value of the approximated maximum/minimum of the stick position
+// stores the value of the approximated maximum/minimum stick position
 const limitPos float32 = 32000.0
 
 // provides the ratio of the stick position to the stick limit position, where
