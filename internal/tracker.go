@@ -37,16 +37,15 @@ type workT func()
 type Tracker struct {
 
 	name string
+	work workT
 
 	joystick        *joystick.Driver
 	joystickAdaptor *joystick.Adaptor
 	robot           *gobot.Robot
 
-	// the physical outputs
+	// ev3 physical devices
 	outA *ev3dev.TachoMotor
 	outB *ev3dev.TachoMotor
-
-	work workT
 }
 
 func NewTracker(name string) *Tracker {
@@ -80,15 +79,7 @@ func (t *Tracker) Run() {
 
 func (t *Tracker) open() bool {
 
-	var err error
 	logrus.Debug("Opening...")
-
-	defer func () {
-		if err != nil {
-			logrus.Fatal("Component can`t be open.")
-		}
-		logrus.Debug("Opened")
-	}()
 
 	if ! t.initMotors() {
 		return false
@@ -96,6 +87,8 @@ func (t *Tracker) open() bool {
 
 	t.initJoystick()
 	t.initWork()
+
+	logrus.Debug("Opened")
 
 	return true
 }
