@@ -1,20 +1,43 @@
 package internal
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/ev3go/ev3dev"
 	"github.com/sirupsen/logrus"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/joystick"
 )
 
-type work_t func()
+// represents an absolute value of an imaginary max speed of a motor
+const motorAbsMaxSpeed = 100
+
+// ev3dev related constants
+const (
+	// inputs
+	ev3OutAPortName = "ev3-ports:outA"
+	ev3OutBPortName = "ev3-ports:outB"
+
+	// devices
+	ev3LargeMotorName = "lego-ev3-l-motor"
+
+	// actions
+	ev3BreakActionName = "break"
+)
+
+// dualshock3 controller driver related constants
+//
+// * you can see more here ../config/dualshock3.json
+//
+const (
+	joystickRightYAxisName = "right_y"
+	joystickLeftYAxisName = "left_y"
+)
+
+type workT func()
 
 type Tracker struct {
 
-	// TODO: nullptr
+	name string
+
 	joystick        *joystick.Driver
 	joystickAdaptor *joystick.Adaptor
 	robot           *gobot.Robot
@@ -23,69 +46,14 @@ type Tracker struct {
 	outA *ev3dev.TachoMotor
 	outB *ev3dev.TachoMotor
 
-	work work_t
+	work workT
 }
 
-func (t *Tracker) open() bool {
-  
-	var err error
-	logrus.Debug("Opening...")
-	defer func () {
-		if err != nil {
-			logrus.Fatal("Component can`t be open.")
-		}
-		logrus.Debug("Opened")
-	}()
+func NewTracker(name string) *Tracker {
+	t := Tracker{}
+	t.name = name
 
-	// stolen here: https://github.com/ev3go/ev3dev/blob/master/examples/demo/demo.go
-	//
-	// get the handle for the medium motor on outA.
-	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-m-motor")
-	if err != nil {
-		logrus.Errorf("Failed to find medium motor on outA: %v", err)
-
-		return false
-	}
-
-	err = outA.SetStopAction("brake").Err()
-	if err != nil {
-		logrus.Errorf("Failed to set brake stop for medium motor on outA: %v", err)
-
-		return false
-	}
-
-	// get the handle for the left large motor on outB.
-	outB, err := ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
-	if err != nil {
-		logrus.Errorf("Failed to find left large motor on outB: %v", err)
-
-		return false
-	}
-
-	err = outB.SetStopAction("brake").Err()
-	if err != nil {
-		logrus.Errorf("Failed to set brake stop for left large motor on outB: %v", err)
-
-		return false
-	}
-
-	t.joystickAdaptor = joystick.NewAdaptor()
-	t.joystick = joystick.NewDriver(t.joystickAdaptor,
-		"../config/dualshock3.json",
-	)
-
-	t.work = func() {
-
-		logrus.Debug("Working...")
-		defer logrus.Debug("Work stoped")
-
-		t.joystick.On(t.joystick.Event("right_x"), t.handleStickAction)
-		t.joystick.On(t.joystick.Event("right_y"), t.handleStickAction)
-		t.joystick.On(t.joystick.Event("left_x"), t.handleStickAction)
-		t.joystick.On(t.joystick.Event("left_y"), t.handleStickAction)
-	}
-
-	return true
+	return &t
 }
 
 func (t *Tracker) Run() {
@@ -97,7 +65,8 @@ func (t *Tracker) Run() {
 	logrus.Debug("Starting...")
 	defer logrus.Debug("Stoped")
 
-	t.robot = gobot.NewRobot("joystickBot",
+	t.robot = gobot.NewRobot(
+		t.name,
 		[]gobot.Connection{t.joystickAdaptor},
 		[]gobot.Device{t.joystick},
 		t.work,
@@ -105,53 +74,112 @@ func (t *Tracker) Run() {
   
 	err := t.robot.Start()
 	if err != nil {
-		logrus.Error("Error occured: ", err)
+		logrus.Errorf("Error occured, err(%v)", err)
 	}
 }
 
-func (t *Tracker) handleStickAction(data interface{}) {
-	logrus.Debugf("right_x data(%v)", data)
+func (t *Tracker) open() bool {
 
-	input, ok := data.(int)
-	if !ok {
-		logrus.Errorf("Invalid input(%v)", data)
+	var err error
+	logrus.Debug("Opening...")
+
+	defer func () {
+		if err != nil {
+			logrus.Fatal("Component can`t be open.")
+		}
+		logrus.Debug("Opened")
+	}()
+
+	if ! t.initMotors() {
+		return false
 	}
 
-	// max is 32000
-	// example: 15.5k / 8k = 1
-	// minimum motor speed quantum is 25
-	speed := (input / 8000) * 25
+	t.initJoystick()
+	t.initWork()
 
-	t.outA.SetSpeedSetpoint(speed).Command("run-forever")
+	return true
+}
 
-	time.Sleep(time.Second / 2)
-	t.outA.Command("stop")
+func (t *Tracker) initMotors() bool {
 
-	checkErrors(t.outA)
+	outA, err := ev3dev.TachoMotorFor(ev3OutAPortName, ev3LargeMotorName)
+	if err != nil {
+		logrus.Errorf("Failed to find right large motor on outA: %v", err)
+
+		return false
+	}
+
+	err = outA.SetStopAction(ev3BreakActionName).Err()
+	if err != nil {
+		logrus.Errorf("Failed to set brake stop for large motor on outA: %v", err)
+
+		return false
+	}
+
+	outB, err := ev3dev.TachoMotorFor(ev3OutBPortName, ev3LargeMotorName)
+	if err != nil {
+		logrus.Errorf("Failed to find left large motor on outB: %v", err)
+
+		return false
+	}
+
+	err = outB.SetStopAction(ev3BreakActionName).Err()
+	if err != nil {
+		logrus.Errorf("Failed to set brake stop for left large motor on outB: %v", err)
+
+		return false
+	}
+
+	return true
+}
+
+func (t *Tracker) initJoystick() {
+
+	t.joystickAdaptor = joystick.NewAdaptor()
+	t.joystick = joystick.NewDriver(t.joystickAdaptor,
+		"../config/dualshock3.json",
+	)
+}
+
+func (t *Tracker) initWork() {
+
+	t.work = func() {
+
+		logrus.Debug("Working...")
+		defer logrus.Debug("Work stopped.")
+
+		var err error
+
+		err = t.joystick.On(t.joystick.Event(joystickRightYAxisName), t.handleRightStickAction)
+		if err != nil {
+			logrus.Errorf("Failed to register a joystick right_y event handler, err(%v)", err)
+		}
+
+		err = t.joystick.On(t.joystick.Event(joystickLeftYAxisName), t.handleLeftStickAction)
+		if err != nil {
+			logrus.Errorf("Failed to register a joystick right_y event handler, err(%v)", err)
+		}
+	}
+}
+
+func (t *Tracker) handleRightStickAction(data interface{}) {
+
+	logrus.Tracef("Joystick event received, right y(%v)", data)
+
+	handleStickEvent(t.outB, data)
+}
+
+func (t *Tracker) handleLeftStickAction(data interface{}) {
+
+	logrus.Tracef("Joystick event received, right y(%v)", data)
+
+	handleStickEvent(t.outA, data)
 }
 
 func (t *Tracker) close() {
 
-}
-
-func checkErrors(devs ...ev3dev.Device) {
-
-	for _, d := range devs {
-
-		err := d.(*ev3dev.TachoMotor).Err()
-		if err != nil {
-
-			drv, dErr := ev3dev.DriverFor(d)
-			if dErr != nil {
-				drv = fmt.Sprintf("(missing driver name: %v)", dErr)
-			}
-
-			addr, aErr := ev3dev.AddressOf(d)
-			if aErr != nil {
-				drv = fmt.Sprintf("(missing port address: %v)", aErr)
-			}
-
-			logrus.Fatalf("motor error for %s:%s on port %s: %v", d, drv, addr, err)
-		}
+	err := t.robot.Stop()
+	if err != nil {
+		logrus.Errorf("Failed to stop a robot, err(%v)", err)
 	}
 }

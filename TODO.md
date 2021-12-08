@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] wrap a `gobot.Robot` third-party framework
+- [ ] wrap a `ev3dev` third-party framework
 - [ ] improve the logging
 - [ ] improve the configuration
 - [ ] integrate the command line options
