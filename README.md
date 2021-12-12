@@ -20,14 +20,17 @@ $ go mod download
 $ go build -x cmd/main.go
 ```
 
+#### macos 10.15 Catalina
+
+* sdl2 is required
+
+```bash
+$ brew install sdl2
+```
+
 ## manual testing
 
 ```bash
 make test
 ```
 
-### macos 10.15 Catalina
-
-```bash
-$ brew install sdl2
-```
