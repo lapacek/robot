@@ -7,7 +7,7 @@ import (
 	"gobot.io/x/gobot/platforms/joystick"
 )
 
-// represents an absolute value of an imaginary max speed of a motor
+// represents an absolute value of an approximate max speed of a motor
 const motorAbsMaxSpeed = 100
 
 // ev3dev related constants
