@@ -18,4 +18,5 @@ build: clean
 test:
 	@go clean -testcache
 	@cd internal && \
+	go mod tidy && \
 	go test -v ./... | grep -v "no test files"
