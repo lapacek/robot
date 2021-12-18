@@ -13,7 +13,7 @@ func Test_joystick_get_stick_pos_ratio_tends_to_zero(t *testing.T) {
 		t.Errorf("Computation failed, err(%v)", err)
 	}
 
-	var expected float32 = 0.0
+	var expected float64 = 0.0
 
 	if ratio != expected {
 		t.Errorf("Computed pos ratio(%v), expected pos ratio(%v)", ratio, expected)
