@@ -16,8 +16,7 @@ $ cd go-ev3-dualshock-3
 ```
 
 ```bash
-$ go mod download
-$ go build -x cmd/main.go
+$ make build
 ```
 
 #### macos 10.15 Catalina
@@ -31,6 +30,6 @@ $ brew install sdl2
 ## manual testing
 
 ```bash
-make test
+$ make test
 ```
 
