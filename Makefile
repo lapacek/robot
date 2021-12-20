@@ -4,6 +4,8 @@ executable_name = "main"
 clean_build_dir:
 	@[ -d $(build_dir) ] && rm -rf $(build_dir) || exit 0
 
+all: build test
+
 .PHONY: clean
 clean: clean_build_dir
 
