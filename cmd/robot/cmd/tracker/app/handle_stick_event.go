@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"time"
@@ -9,7 +9,7 @@ import (
 
 func handleStickEvent(motor *ev3dev.TachoMotor, data interface{}) {
 
-	ratio, err := GetStickPosRatio(data)
+	ratio, err := StickPosRatio(data)
 	if err != nil {
 		logrus.Errorf("Computation failed, err(%v)", err)
 	}

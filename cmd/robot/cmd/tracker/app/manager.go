@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"github.com/ev3go/ev3dev"
@@ -26,16 +26,14 @@ const (
 // dualshock3 controller driver related constants
 //
 // * you can see more here ../config/dualshock3.json
-//
 const (
 	joystickRightYAxisName = "right_y"
-	joystickLeftYAxisName = "left_y"
+	joystickLeftYAxisName  = "left_y"
 )
 
 type workT func()
 
-type Tracker struct {
-
+type Manager struct {
 	name string
 	work workT
 
@@ -48,14 +46,14 @@ type Tracker struct {
 	outB *ev3dev.TachoMotor
 }
 
-func NewTracker(name string) *Tracker {
-	t := Tracker{}
+func NewManager(name string) *Manager {
+	t := Manager{}
 	t.name = name
 
 	return &t
 }
 
-func (t *Tracker) Run() {
+func (t *Manager) Run() {
 
 	if !t.open() {
 		logrus.Fatal("Component is not opened.")
@@ -70,18 +68,18 @@ func (t *Tracker) Run() {
 		[]gobot.Device{t.joystick},
 		t.work,
 	)
-  
+
 	err := t.robot.Start()
 	if err != nil {
 		logrus.Errorf("Error occured, err(%v)", err)
 	}
 }
 
-func (t *Tracker) open() bool {
+func (t *Manager) open() bool {
 
 	logrus.Debug("Opening...")
 
-	if ! t.initMotors() {
+	if !t.initMotors() {
 		return false
 	}
 
@@ -93,7 +91,7 @@ func (t *Tracker) open() bool {
 	return true
 }
 
-func (t *Tracker) initMotors() bool {
+func (t *Manager) initMotors() bool {
 
 	outA, err := ev3dev.TachoMotorFor(ev3OutAPortName, ev3LargeMotorName)
 	if err != nil {
@@ -126,7 +124,7 @@ func (t *Tracker) initMotors() bool {
 	return true
 }
 
-func (t *Tracker) initJoystick() {
+func (t *Manager) initJoystick() {
 
 	t.joystickAdaptor = joystick.NewAdaptor()
 	t.joystick = joystick.NewDriver(t.joystickAdaptor,
@@ -134,7 +132,7 @@ func (t *Tracker) initJoystick() {
 	)
 }
 
-func (t *Tracker) initWork() {
+func (t *Manager) initWork() {
 
 	t.work = func() {
 
@@ -155,21 +153,21 @@ func (t *Tracker) initWork() {
 	}
 }
 
-func (t *Tracker) handleRightStickAction(data interface{}) {
+func (t *Manager) handleRightStickAction(data interface{}) {
 
 	logrus.Tracef("Joystick event received, right y(%v)", data)
 
 	handleStickEvent(t.outB, data)
 }
 
-func (t *Tracker) handleLeftStickAction(data interface{}) {
+func (t *Manager) handleLeftStickAction(data interface{}) {
 
 	logrus.Tracef("Joystick event received, right y(%v)", data)
 
 	handleStickEvent(t.outA, data)
 }
 
-func (t *Tracker) close() {
+func (t *Manager) close() {
 
 	err := t.robot.Stop()
 	if err != nil {
