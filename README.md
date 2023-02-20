@@ -1,35 +1,61 @@
-# go-ev3-dualshock3
+# robot
 
-The EV3 robot controlled by Dualshock3.
+We build robot system on the lego mindstorms ev3 platform.
+Project start with the simplest components and build up to a complete robot. 
 
-## motivation
-
-For kids.
-
-## development
-
-### build
+## system
 
 ```bash
-$ git clone github.com/lapacek/go-ev3-dualshock-3
-$ cd go-ev3-dualshock-3
+```
+
+## arch
+
+### design decisions
+
+```bash
+```
+
+## test
+
+```bash
+$ make test
+```
+
+## build
+
+### MacOS 13.01 Ventura
+
+```bash
+$ git clone github.com/lapacek/tracker
+$ cd tracker
 ```
 
 ```bash
 $ make build
 ```
 
-#### macos 10.15 Catalina
+## run
 
-* sdl2 is required
+#### MacOS 13.01 Ventura
+
+Works on Silicon M1, x86_64 Intel macs.
+
+```bash
+
+* *sdl2* required
+* *pkg-config* required
 
 ```bash
 $ brew install sdl2
+$ brew install pkg-config
 ```
 
-## manual testing
+#### Fedora 37 Linux
 
 ```bash
-$ make test
 ```
 
+#### Lego Mindstorms EV3
+
+```bash
+```
