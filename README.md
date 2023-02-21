@@ -1,30 +1,25 @@
 # robot
 
 We build robot system on the lego mindstorms ev3 platform.
-Project start with the simplest components and build up to a complete robot. 
+Project start with the simplest components and build up to a complete robot.
 
-## system
+### build
 
-```bash
-```
+#### MacOS 13.01 Ventura
 
-## arch
+Works on Silicon **M1**, **x86_64** Intel macs.
 
-### design decisions
-
-```bash
-```
-
-## test
+Install dependencies:
 
 ```bash
-# execute all tests
-$ make test
+# missing sdl2
+$ brew install sdl2
+
+# missing pkg-config
+$ brew install pkg-config
 ```
 
-## build
-
-### MacOS 13.01 Ventura
+Build the project:
 
 ```bash
 # dowload the project
@@ -39,30 +34,45 @@ $ make build
 # result is in the ./build directory
 ```
 
-## run
+### test
 
-#### MacOS 13.01 Ventura
-
-Works on Silicon **M1**, **x86_64** Intel macs.
+Test the project:
 
 ```bash
-# missing sdl2
-$ brew install sdl2
-
-# missing pkg-config
-$ brew install pkg-config
+# execute all tests
+$ make test
 ```
 
-#### Fedora 37 Linux
+### run
 
-Works on **x86_64** Intel machines.
+You can run the project from the build directory or install it and run from project directory.
+Program is called `robot` and take name of system argument 
+
+Run the project:
 
 ```bash
-# missing SDL2-devel
-$ sudo dnf install SDL2-devel
+# build the project after clone repo
+$ make build
+
+# run the project
+$ ./build/robot
+
+# install the project
+$ make install
+
+# run the project after install
+$ ./robot
 ```
 
-#### Lego Mindstorms EV3
+Program usage example:
 
 ```bash
+# print help
+$ ./robot --help
+
+# list all system components
+$ ./robot --list
+
+# run the project with name of system component
+$ ./robot {component}
 ```
