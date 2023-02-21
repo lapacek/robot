@@ -157,14 +157,14 @@ func (t *Manager) handleRightStickAction(data interface{}) {
 
 	logrus.Tracef("Joystick event received, right y(%v)", data)
 
-	handleStickEvent(t.outB, data)
+	onStickEvent(t.outB, data)
 }
 
 func (t *Manager) handleLeftStickAction(data interface{}) {
 
 	logrus.Tracef("Joystick event received, right y(%v)", data)
 
-	handleStickEvent(t.outA, data)
+	onStickEvent(t.outA, data)
 }
 
 func (t *Manager) close() {

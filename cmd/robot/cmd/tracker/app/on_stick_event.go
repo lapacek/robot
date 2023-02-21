@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func handleStickEvent(motor *ev3dev.TachoMotor, data interface{}) {
+func onStickEvent(motor *ev3dev.TachoMotor, data interface{}) {
 
 	ratio, err := StickPosRatio(data)
 	if err != nil {
