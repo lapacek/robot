@@ -11,13 +11,11 @@ Components are the building blocks of the robot system. Each component is a sepa
 
 name | description
 --- | ---
-[tracker](doc/Tracker.md) | Robot movement platform control.
+[tracker](cmd/robot/cmd/tracker/Readme.md) | Robot movement platform control.
 
 ## automation
 
 ### build
-
-#### MacOS 13.01 Ventura
 
 Install dependencies: *(Silicon **M1**, **x86_64** Intel macs)*
 
@@ -93,3 +91,7 @@ $ ./robot --list
 # run the project with name of system component
 $ ./robot {component}
 ```
+
+## deployment
+
+Read about a deployment of system components on target platforms [here](doc/Deployment.md).
