@@ -18,6 +18,7 @@ Project start with the simplest components and build up to a complete robot.
 ## test
 
 ```bash
+# execute all tests
 $ make test
 ```
 
@@ -26,33 +27,39 @@ $ make test
 ### MacOS 13.01 Ventura
 
 ```bash
-$ git clone github.com/lapacek/tracker
-$ cd tracker
-```
+# dowload the project
+$ git clone github.com/lapacek/robot.git
 
-```bash
+# change directory to the project
+$ cd robot
+
+# build the project
 $ make build
+
+# result is in the ./build directory
 ```
 
 ## run
 
 #### MacOS 13.01 Ventura
 
-Works on Silicon M1, x86_64 Intel macs.
+Works on Silicon **M1**, **x86_64** Intel macs.
 
 ```bash
-
-* *sdl2* required
-* *pkg-config* required
-
-```bash
+# missing sdl2
 $ brew install sdl2
+
+# missing pkg-config
 $ brew install pkg-config
 ```
 
 #### Fedora 37 Linux
 
+Works on **x86_64** Intel machines.
+
 ```bash
+# missing SDL2-devel
+$ sudo dnf install SDL2-devel
 ```
 
 #### Lego Mindstorms EV3
