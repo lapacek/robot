@@ -3,17 +3,17 @@
 We build robot system on the lego mindstorms ev3 platform.
 Project start with the simplest components and build up to a complete robot.
 
-## Architecture
+## architecture
 
-### Components
+### components
 
 Components are the building blocks of the robot system. Each component is a separate program that can be run independently of the other components. The components communicate with each other using the message bus.
 
 name | description
 --- | ---
-[tracker](#tracker) | Robot movement platform control.
+[tracker](lapacek/robot/doc/Tracker.md) | Robot movement platform control.
 
-## Automation
+## automation
 
 ### build
 
