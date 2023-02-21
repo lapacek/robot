@@ -3,13 +3,23 @@
 We build robot system on the lego mindstorms ev3 platform.
 Project start with the simplest components and build up to a complete robot.
 
+## architecture
+
+### components
+
+Components are the building blocks of the robot system. Each component is a separate program that can be run independently of the other components. The components communicate with each other using the message bus.
+
+name | description
+--- | ---
+[tracker](doc/Tracker.md) | Robot movement platform control.
+
+## automation
+
 ### build
 
 #### MacOS 13.01 Ventura
 
-Works on Silicon **M1**, **x86_64** Intel macs.
-
-Install dependencies:
+Install dependencies: *(Silicon **M1**, **x86_64** Intel macs)*
 
 ```bash
 # missing sdl2
@@ -17,6 +27,13 @@ $ brew install sdl2
 
 # missing pkg-config
 $ brew install pkg-config
+```
+
+Install dependencies: *(Fedora 37 **x86_64** Linux)*
+
+```bash
+# missing sdl2
+$ sudo dnf install SDL2-devel
 ```
 
 Build the project:
