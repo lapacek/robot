@@ -11,7 +11,7 @@ Components are the building blocks of the robot system. Each component is a sepa
 
 name | description
 --- | ---
-[tracker](lapacek/robot/doc/Tracker.md) | Robot movement platform control.
+[tracker](doc/Tracker.md) | Robot movement platform control.
 
 ## automation
 
