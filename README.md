@@ -1,9 +1,9 @@
-# robot
+# Robot
 
 We build robot system on the lego mindstorms ev3 platform.
 Project start with the simplest components and build up to a complete robot.
 
-## components
+## Components
 
 Components are the building blocks of the robot system. Each component is a separate program that can be run independently of the other components. The components communicate with each other using the message bus.
 
@@ -11,7 +11,7 @@ name | description
 --- | ---
 [tracker](cmd/robot/cmd/tracker/README.md) | Robot movement platform control.
 
-## build the project
+## Build the project
 
 ### Install dependencies: 
 
@@ -47,14 +47,14 @@ $ make build
 # result is in the ./build directory
 ```
 
-## test the project:
+## Run unit tests
 
 ```bash
 # execute all tests
 $ make test
 ```
 
-## run program
+## Run program
 
 You can run the project from the build directory or install it and run from project directory.
 Program is called `robot` and take name of system argument
@@ -83,6 +83,6 @@ $ ./robot --list
 $ ./robot {component}
 ```
 
-## deployment
+## Deployment
 
 Read about a deployment of system components on target platforms [here](doc/Deployment.md).

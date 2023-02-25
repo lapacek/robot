@@ -1,4 +1,4 @@
-## deployment
+# Deployment
 
 - [ev3 brick](#ev3-brick)
 
