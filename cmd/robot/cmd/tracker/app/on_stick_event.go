@@ -7,6 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// onStickEvent is a callback function that is called when a joystick event is triggered.
+// It takes a joystick data and controls the motor.
 func onStickEvent(motor *ev3dev.TachoMotor, data interface{}) {
 
 	ratio, err := StickPosRatio(data)

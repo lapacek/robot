@@ -3,21 +3,19 @@
 We build robot system on the lego mindstorms ev3 platform.
 Project start with the simplest components and build up to a complete robot.
 
-## architecture
-
-### components
+## components
 
 Components are the building blocks of the robot system. Each component is a separate program that can be run independently of the other components. The components communicate with each other using the message bus.
 
 name | description
 --- | ---
-[tracker](cmd/robot/cmd/tracker/Readme.md) | Robot movement platform control.
+[tracker](cmd/robot/cmd/tracker/README.md) | Robot movement platform control.
 
-## automation
+## build the project
 
-### build
+### Install dependencies: 
 
-Install dependencies: *(Silicon **M1**, **x86_64** Intel macs)*
+*(Silicon **M1**, **x86_64** Intel macs)*
 
 ```bash
 # missing sdl2
@@ -27,14 +25,14 @@ $ brew install sdl2
 $ brew install pkg-config
 ```
 
-Install dependencies: *(Fedora 37 **x86_64** Linux)*
+*(Fedora 37 **x86_64** Linux)*
 
 ```bash
 # missing sdl2
 $ sudo dnf install SDL2-devel
 ```
 
-Build the project:
+### Download and compile the project:
 
 ```bash
 # dowload the project
@@ -49,27 +47,20 @@ $ make build
 # result is in the ./build directory
 ```
 
-### test
-
-Test the project:
+## test the project:
 
 ```bash
 # execute all tests
 $ make test
 ```
 
-### run
+## run program
 
 You can run the project from the build directory or install it and run from project directory.
-Program is called `robot` and take name of system argument 
-
-Run the project:
+Program is called `robot` and take name of system argument
 
 ```bash
-# build the project after clone repo
-$ make build
-
-# run the project
+# run the project after build
 $ ./build/robot
 
 # install the project
