@@ -1,6 +1,6 @@
 build_dir = "build"
 executable = "robot"
-arm_executable = "robot.linux_arm"
+executable_arm = "robot.linux_arm"
 
 clean_build_dir:
 	@[ -d $(build_dir) ] && rm -rf $(build_dir) || exit 0
@@ -15,13 +15,13 @@ test-tracker:
 build-ev3:
 	@docker build --platform=linux/arm -t ev3arm32v5go -f ./script/Dockerfile . && \
 	docker tag ev3arm32v5go ev3arm && \
-	docker run --rm --platform linux/arm -v $(shell pwd)/$(build_dir):/$(build_dir) -it ev3arm /bin/sh -c "cp -r /app/build/$(arm_executable) /$(build_dir)/"
+	docker run --rm --platform linux/arm -v $(shell pwd)/$(build_dir):/$(build_dir) -it ev3arm /bin/sh -c "cp -r /app/build/$(executable_arm) /$(build_dir)/"
 
 .PHONY: compile-ev3
 compile-ev3:
-	@if [ -f $(build_dir)/$(arm_executable) ]; then rm $(build_dir)/$(arm_executable); fi && \
+	@if [ -f $(build_dir)/$(executable_arm) ]; then rm $(build_dir)/$(executable_arm); fi && \
 	cd cmd/robot/ && \
-	env GOOS=linux GOARCH=arm CGO_ENABLED=1 go build -o ./../../$(build_dir)/$(arm_executable)
+	env GOOS=linux GOARCH=arm CGO_ENABLED=1 go build -o ./../../$(build_dir)/$(executable_arm)
 
 .PHONY: test
 test: test-tracker
