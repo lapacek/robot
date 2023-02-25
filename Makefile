@@ -28,7 +28,7 @@ test: test-tracker
 
 .PHONY: clean
 clean: clean_build_dir
-	@if [ -f $(executable_name) ]; then rm $(executable_name); fi
+	@if [ -f $(executable) ]; then rm $(executable); fi
 
 .PHONY: build
 build: clean
