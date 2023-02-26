@@ -11,6 +11,8 @@ test-tracker:
 	@cd cmd/robot/cmd/tracker && \
 	go test -v ./... | grep -v "no test files"
 
+# TODO: improve this to copy the binary from the docker image via a output option
+# https://stackoverflow.com/questions/63242674/how-to-copy-files-from-a-docker-image-dockerfile-cmd
 .PHONY: build-ev3
 build-ev3:
 	@docker build --platform=linux/arm -t ev3arm32v5go -f ./script/Dockerfile . && \

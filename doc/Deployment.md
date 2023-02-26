@@ -13,6 +13,7 @@ The EV3 brick is powered by the ARM926EJ-S 32-bit (ARMv5Tej) processor.
 * [www,ev3dev.org - prepare brick](https://www.ev3dev.org/docs/getting-started/)
 * [www.ev3dev.org - connect brick](https://www.ev3dev.org/docs/tutorials/connecting-to-ev3dev-with-ssh/)
 * [www.ev3dev.org - connect internet](https://www.ev3dev.org/docs/tutorials/connecting-to-the-internet-via-usb/)
+* [www.ev3dev.org - connect Wi-Fi](https://www.ev3dev.org/docs/tutorials/setting-up-wifi-using-the-command-line/)
 
 ### Build project for the EV3 brick:
 
