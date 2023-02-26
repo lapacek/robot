@@ -12,7 +12,7 @@ const motorAbsMaxSpeed = 100
 
 // ev3dev related constants
 const (
-	// inputs
+	// output ports
 	ev3OutAPortName = "ev3-ports:outA"
 	ev3OutBPortName = "ev3-ports:outB"
 
@@ -141,28 +141,28 @@ func (t *Manager) initWork() {
 
 		var err error
 
-		err = t.joystick.On(t.joystick.Event(joystickRightYAxisName), t.handleRightStickAction)
+		err = t.joystick.On(t.joystick.Event(joystickRightYAxisName), t.rightStickAction)
 		if err != nil {
 			logrus.Errorf("Failed to register a joystick right_y event handler, err(%v)", err)
 		}
 
-		err = t.joystick.On(t.joystick.Event(joystickLeftYAxisName), t.handleLeftStickAction)
+		err = t.joystick.On(t.joystick.Event(joystickLeftYAxisName), t.leftStickAction)
 		if err != nil {
 			logrus.Errorf("Failed to register a joystick right_y event handler, err(%v)", err)
 		}
 	}
 }
 
-func (t *Manager) handleRightStickAction(data interface{}) {
+func (t *Manager) rightStickAction(data interface{}) {
 
 	logrus.Tracef("Joystick event received, right y(%v)", data)
 
 	onStickEvent(t.outB, data)
 }
 
-func (t *Manager) handleLeftStickAction(data interface{}) {
+func (t *Manager) leftStickAction(data interface{}) {
 
-	logrus.Tracef("Joystick event received, right y(%v)", data)
+	logrus.Tracef("Joystick event received, left y(%v)", data)
 
 	onStickEvent(t.outA, data)
 }
